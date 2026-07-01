@@ -6,12 +6,12 @@ final class AboutWindowController: NSWindowController, NSWindowDelegate {
 
     private convenience init() {
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 280),
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 520),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
-        window.title = "Über Snipping Tool"
+        window.title = "Snipping Tool"
         window.isReleasedWhenClosed = false
         window.center()
         self.init(window: window)
@@ -19,7 +19,7 @@ final class AboutWindowController: NSWindowController, NSWindowDelegate {
     }
 
     func show() {
-        window?.contentView = NSHostingView(rootView: AboutView())
+        window?.contentView = NSHostingView(rootView: AboutAndHelpView())
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
@@ -33,12 +33,29 @@ final class AboutWindowController: NSWindowController, NSWindowDelegate {
     }
 }
 
-struct AboutView: View {
+struct AboutAndHelpView: View {
+    @State private var selectedTab = 0
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            AboutTab()
+                .tabItem { Label("Info", systemImage: "info.circle") }
+                .tag(0)
+            HelpTab()
+                .tabItem { Label("Dokumentation", systemImage: "book") }
+                .tag(1)
+        }
+        .frame(width: 480, height: 500)
+    }
+}
+
+struct AboutTab: View {
     private let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     private let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
 
     var body: some View {
         VStack(spacing: 16) {
+            Spacer()
             if let appIcon = NSImage(named: NSImage.applicationIconName) {
                 Image(nsImage: appIcon)
                     .resizable()
@@ -60,14 +77,103 @@ struct AboutView: View {
                 .clipShape(Capsule())
 
             VStack(spacing: 4) {
-                Text("Marco Wende — Wende.IT")
+                Text("Marco Wende \u{2014} Wende.IT")
                     .font(.body)
-
                 Link("wende.it", destination: URL(string: "https://wende.it")!)
                     .font(.body)
             }
+            Spacer()
         }
-        .padding(30)
-        .frame(width: 320, height: 280)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct HelpTab: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                helpSection("Aufnahme-Modi") {
+                    helpRow("Ganzer Bildschirm", "Nimmt den gesamten Bildschirm auf")
+                    helpRow("Fenster", "Klicke auf ein Fenster, um es aufzunehmen")
+                    helpRow("Bereich", "Ziehe einen Rahmen um den gewünschten Bereich")
+                }
+
+                helpSection("Bildeditor") {
+                    helpRow("Pfeil", "Linie mit Pfeilspitze zeichnen")
+                    helpRow("Rechteck", "Rahmen um einen Bereich zeichnen")
+                    helpRow("Ellipse", "Kreis oder Oval zeichnen")
+                    helpRow("Text", "Klicke auf eine Stelle und tippe Text ein")
+                    helpRow("\u{2318}Z / \u{2318}\u{21e7}Z", "Rückgängig / Wiederholen")
+                    helpRow("\u{232b} / Entf", "Ausgewählte Annotation löschen")
+                }
+
+                helpSection("URL-Schema") {
+                    Text("Zum Auslösen per Logitech Options+, Kurzbefehle, Stream Deck o.\u{202f}ä.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom, 4)
+                    urlRow("snippingtool://fullscreen", "Vollbild-Screenshot")
+                    urlRow("snippingtool://window", "Fenster-Screenshot")
+                    urlRow("snippingtool://region", "Bereich-Screenshot")
+                    urlRow("snippingtool://region?edit=true", "Bereich + Editor")
+                    urlRow("snippingtool://fullscreen?edit=true", "Vollbild + Editor")
+                    urlRow("snippingtool://edit", "Bild aus Datei bearbeiten")
+                    urlRow("snippingtool://editlast", "Letzten Screenshot bearbeiten")
+                }
+
+                helpSection("Einrichtung in Logitech Options+") {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("1. Logi Options+ öffnen und Gerät wählen")
+                        Text("2. Taste zuweisen: Aktion = URL öffnen")
+                        Text("3. URL eintragen, z.\u{202f}B.:")
+                        Text("   snippingtool://region?edit=true")
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.callout)
+                }
+
+                helpSection("Hinweise") {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\u{2022} Berechtigung Bildschirmaufnahme erforderlich (Systemeinstellungen \u{2192} Datenschutz & Sicherheit)")
+                        Text("\u{2022} Speicherort: ~/Bilder/Screenshots (änderbar in Einstellungen)")
+                        Text("\u{2022} Tastenkürzel frei konfigurierbar in den Einstellungen")
+                    }
+                    .font(.callout)
+                }
+            }
+            .padding(20)
+        }
+    }
+
+    private func helpSection(_ title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+            content()
+        }
+    }
+
+    private func helpRow(_ label: String, _ description: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(label)
+                .fontWeight(.medium)
+                .frame(width: 120, alignment: .leading)
+            Text(description)
+                .foregroundStyle(.secondary)
+        }
+        .font(.callout)
+    }
+
+    private func urlRow(_ url: String, _ description: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(url)
+                .font(.system(.caption, design: .monospaced))
+                .textSelection(.enabled)
+                .frame(width: 260, alignment: .leading)
+            Text(description)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
     }
 }
