@@ -1,11 +1,11 @@
 import SwiftUI
 
 @main
-struct SnippingToolApp: App {
+struct SnipMCApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("Snipping Tool", systemImage: "camera.viewfinder") {
+        MenuBarExtra("SnipMC", systemImage: "camera.viewfinder") {
             MenuBarContentView()
                 .environmentObject(appDelegate.coordinator)
         }

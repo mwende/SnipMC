@@ -97,13 +97,8 @@ final class AppCoordinator: ObservableObject {
 
     // MARK: - External triggers (URL scheme)
 
-    /// Handles `snippingtool://<mode>` URLs so external tools (Logitech
-    /// Options, Shortcuts, Stream Deck, `open` from the command line, …)
-    /// can trigger a specific capture mode instead of just launching the app.
-    /// Accepts the mode either as the host (`snippingtool://region`) or as
-    /// a query item (`snippingtool://capture?mode=region`).
     func handle(url: URL) {
-        guard url.scheme?.caseInsensitiveCompare("snippingtool") == .orderedSame else { return }
+        guard url.scheme?.caseInsensitiveCompare("snipmc") == .orderedSame else { return }
 
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let queryItems = components?.queryItems ?? []
@@ -141,7 +136,7 @@ final class AppCoordinator: ObservableObject {
             mode = .region
         default:
             mode = nil
-            NSLog("SnippingTool: unrecognized URL trigger \(url.absoluteString)")
+            NSLog("SnipMC: unrecognized URL trigger \(url.absoluteString)")
         }
 
         if let mode {
@@ -180,7 +175,7 @@ final class AppCoordinator: ObservableObject {
         do {
             try process.run()
         } catch {
-            NSLog("SnippingTool: failed to launch screencapture: \(error)")
+            NSLog("SnipMC: failed to launch screencapture: \(error)")
         }
     }
 
@@ -266,7 +261,7 @@ final class AppCoordinator: ObservableObject {
         do {
             try data.write(to: url, options: .atomic)
         } catch {
-            NSLog("SnippingTool: failed to save annotated image: \(error)")
+            NSLog("SnipMC: failed to save annotated image: \(error)")
         }
 
         if outputAction.copiesToClipboard {

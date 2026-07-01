@@ -11,7 +11,7 @@ final class AboutWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Snipping Tool"
+        window.title = "SnipMC"
         window.isReleasedWhenClosed = false
         window.center()
         self.init(window: window)
@@ -62,7 +62,7 @@ struct AboutTab: View {
                     .frame(width: 80, height: 80)
             }
 
-            Text("Snipping Tool")
+            Text("SnipMC")
                 .font(.title.bold())
 
             Text("Version \(version) (\(build))")
@@ -95,7 +95,7 @@ struct HelpTab: View {
                 helpSection("Aufnahme-Modi") {
                     helpRow("Ganzer Bildschirm", "Nimmt den gesamten Bildschirm auf")
                     helpRow("Fenster", "Klicke auf ein Fenster, um es aufzunehmen")
-                    helpRow("Bereich", "Ziehe einen Rahmen um den gewünschten Bereich")
+                    helpRow("Bereich", "Ziehe einen Rahmen um den gew\u{00fc}nschten Bereich")
                 }
 
                 helpSection("Bildeditor") {
@@ -103,31 +103,31 @@ struct HelpTab: View {
                     helpRow("Rechteck", "Rahmen um einen Bereich zeichnen")
                     helpRow("Ellipse", "Kreis oder Oval zeichnen")
                     helpRow("Text", "Klicke auf eine Stelle und tippe Text ein")
-                    helpRow("\u{2318}Z / \u{2318}\u{21e7}Z", "Rückgängig / Wiederholen")
-                    helpRow("\u{232b} / Entf", "Ausgewählte Annotation löschen")
+                    helpRow("\u{2318}Z / \u{2318}\u{21e7}Z", "R\u{00fc}ckg\u{00e4}ngig / Wiederholen")
+                    helpRow("\u{232b} / Entf", "Ausgew\u{00e4}hlte Annotation l\u{00f6}schen")
                 }
 
                 helpSection("URL-Schema") {
-                    Text("Zum Auslösen per Logitech Options+, Kurzbefehle, Stream Deck o.\u{202f}ä.")
+                    Text("Zum Ausl\u{00f6}sen per Logitech Options+, Kurzb efehle, Stream Deck o.\u{202f}\u{00e4}.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .padding(.bottom, 4)
-                    urlRow("snippingtool://fullscreen", "Vollbild-Screenshot")
-                    urlRow("snippingtool://window", "Fenster-Screenshot")
-                    urlRow("snippingtool://region", "Bereich-Screenshot")
-                    urlRow("snippingtool://region?edit=true", "Bereich + Editor")
-                    urlRow("snippingtool://fullscreen?edit=true", "Vollbild + Editor")
-                    urlRow("snippingtool://edit", "Bild aus Datei bearbeiten")
-                    urlRow("snippingtool://editlast", "Letzten Screenshot bearbeiten")
-                    urlRow("snippingtool://clipboard", "Zwischenablage bearbeiten")
+                    urlRow("snipmc://fullscreen", "Vollbild-Screenshot")
+                    urlRow("snipmc://window", "Fenster-Screenshot")
+                    urlRow("snipmc://region", "Bereich-Screenshot")
+                    urlRow("snipmc://region?edit=true", "Bereich + Editor")
+                    urlRow("snipmc://fullscreen?edit=true", "Vollbild + Editor")
+                    urlRow("snipmc://edit", "Bild aus Datei bearbeiten")
+                    urlRow("snipmc://editlast", "Letzten Screenshot bearbeiten")
+                    urlRow("snipmc://clipboard", "Zwischenablage bearbeiten")
                 }
 
                 helpSection("Einrichtung in Logitech Options+") {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("1. Logi Options+ öffnen und Gerät wählen")
-                        Text("2. Taste zuweisen: Aktion = URL öffnen")
+                        Text("1. Logi Options+ \u{00f6}ffnen und Ger\u{00e4}t w\u{00e4}hlen")
+                        Text("2. Taste zuweisen: Aktion = URL \u{00f6}ffnen")
                         Text("3. URL eintragen, z.\u{202f}B.:")
-                        Text("   snippingtool://region?edit=true")
+                        Text("   snipmc://region?edit=true")
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(.secondary)
                     }
@@ -137,8 +137,8 @@ struct HelpTab: View {
                 helpSection("Hinweise") {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\u{2022} Berechtigung Bildschirmaufnahme erforderlich (Systemeinstellungen \u{2192} Datenschutz & Sicherheit)")
-                        Text("\u{2022} Speicherort: ~/Bilder/Screenshots (änderbar in Einstellungen)")
-                        Text("\u{2022} Tastenkürzel frei konfigurierbar in den Einstellungen")
+                        Text("\u{2022} Speicherort: ~/Bilder/Screenshots (\u{00e4}nderbar in Einstellungen)")
+                        Text("\u{2022} Tastenk\u{00fc}rzel frei konfigurierbar in den Einstellungen")
                     }
                     .font(.callout)
                 }

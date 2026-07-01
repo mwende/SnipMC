@@ -31,7 +31,7 @@ struct MenuBarContentView: View {
         }
         .keyboardShortcut(",")
 
-        Button("Über Snipping Tool…") {
+        Button("Über SnipMC…") {
             AboutWindowController.shared.show()
         }
 
