@@ -122,18 +122,6 @@ struct HelpTab: View {
                     urlRow("snipmc://clipboard", "Zwischenablage bearbeiten")
                 }
 
-                helpSection("Einrichtung in Logitech Options+") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("1. Logi Options+ \u{00f6}ffnen und Ger\u{00e4}t w\u{00e4}hlen")
-                        Text("2. Taste zuweisen: Aktion = URL \u{00f6}ffnen")
-                        Text("3. URL eintragen, z.\u{202f}B.:")
-                        Text("   snipmc://region?edit=true")
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                    }
-                    .font(.callout)
-                }
-
                 helpSection("Hinweise") {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("\u{2022} Berechtigung Bildschirmaufnahme erforderlich (Systemeinstellungen \u{2192} Datenschutz & Sicherheit)")

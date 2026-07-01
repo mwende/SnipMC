@@ -70,12 +70,6 @@ SnipMC registriert das URL-Schema `snipmc://` und kann so von externen Tools ges
 | `snipmc://editlast` | Letzten Screenshot im Editor bearbeiten |
 | `snipmc://clipboard` | Bild aus Zwischenablage bearbeiten |
 
-### Einrichtung in Logitech Options+
-
-1. Logi Options+ öffnen und Gerät wählen
-2. Taste zuweisen: Aktion = **URL öffnen**
-3. URL eintragen, z. B.: `snipmc://region?edit=true`
-
 ### Einrichtung per macOS Kurzbefehle
 
 1. Kurzbefehle-App öffnen
