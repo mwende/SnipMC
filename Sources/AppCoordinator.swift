@@ -92,6 +92,35 @@ final class AppCoordinator: ObservableObject {
         }
     }
 
+    // MARK: - External triggers (URL scheme)
+
+    /// Handles `snippingtool://<mode>` URLs so external tools (Logitech
+    /// Options, Shortcuts, Stream Deck, `open` from the command line, …)
+    /// can trigger a specific capture mode instead of just launching the app.
+    /// Accepts the mode either as the host (`snippingtool://region`) or as
+    /// a query item (`snippingtool://capture?mode=region`).
+    func handle(url: URL) {
+        guard url.scheme?.caseInsensitiveCompare("snippingtool") == .orderedSame else { return }
+
+        let modeString = url.host?.lowercased()
+            ?? URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?
+                .first(where: { $0.name.caseInsensitiveCompare("mode") == .orderedSame })?
+                .value?
+                .lowercased()
+
+        switch modeString {
+        case "fullscreen", "full", "full-screen", "screen":
+            capture(mode: .fullScreen)
+        case "window":
+            capture(mode: .window)
+        case "region", "area", "selection":
+            capture(mode: .region)
+        default:
+            NSLog("SnippingTool: unrecognized URL trigger \(url.absoluteString)")
+        }
+    }
+
     // MARK: - Capture
 
     func capture(mode: CaptureMode) {

@@ -18,6 +18,10 @@ targets:
         CFBundleName: Snipping Tool
         LSUIElement: true
         NSHumanReadableCopyright: "Copyright © 2026"
+        CFBundleURLTypes:
+          - CFBundleURLName: it.wende.snippingtool
+            CFBundleURLSchemes:
+              - snippingtool
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: it.wende.snippingtool

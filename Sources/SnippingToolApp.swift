@@ -2,12 +2,12 @@ import SwiftUI
 
 @main
 struct SnippingToolApp: App {
-    @StateObject private var coordinator = AppCoordinator()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
         MenuBarExtra("Snipping Tool", systemImage: "camera.viewfinder") {
             MenuBarContentView()
-                .environmentObject(coordinator)
+                .environmentObject(appDelegate.coordinator)
         }
         .menuBarExtraStyle(.menu)
     }
