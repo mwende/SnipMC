@@ -121,6 +121,11 @@ final class AppCoordinator: ObservableObject {
             return
         }
 
+        if modeString == "editlast" || modeString == "edit-last" || modeString == "lastedit" {
+            openEditorForLastCapture()
+            return
+        }
+
         let mode: CaptureMode?
         switch modeString {
         case "fullscreen", "full", "full-screen", "screen":
