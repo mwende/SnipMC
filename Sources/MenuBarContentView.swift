@@ -27,6 +27,10 @@ struct MenuBarContentView: View {
         }
         .keyboardShortcut(",")
 
+        Button("Über Snipping Tool…") {
+            AboutWindowController.shared.show()
+        }
+
         Divider()
 
         Button("Beenden") {
