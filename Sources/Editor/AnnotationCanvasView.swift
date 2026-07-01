@@ -77,7 +77,7 @@ final class AnnotationCanvasView: NSView {
 
         let imgRect = imageRect
         NSGraphicsContext.current?.imageInterpolation = .high
-        image.draw(in: imgRect, from: .zero, operation: .sourceOver, fraction: 1)
+        image.draw(in: imgRect, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
 
         context.saveGState()
         context.translateBy(x: imgRect.origin.x, y: imgRect.origin.y)
