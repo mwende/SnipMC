@@ -116,6 +116,11 @@ final class AppCoordinator: ObservableObject {
             .value?.lowercased() ?? "false"
         let openEditor = ["true", "1", "yes"].contains(wantsEditor)
 
+        if modeString == "edit" {
+            openEditorForFile()
+            return
+        }
+
         let mode: CaptureMode?
         switch modeString {
         case "fullscreen", "full", "full-screen", "screen":
@@ -196,17 +201,27 @@ final class AppCoordinator: ObservableObject {
         guard let url = lastCapturedURL,
               FileManager.default.fileExists(atPath: url.path),
               let image = NSImage(contentsOf: url) else { return }
-        openEditor(image: image, sourceURL: url)
+        DispatchQueue.main.async {
+            self.openEditor(image: image, sourceURL: url)
+        }
     }
 
     func openEditorForFile() {
-        let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.png, .jpeg, .tiff, .bmp]
-        panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = false
-        guard panel.runModal() == .OK, let url = panel.url,
-              let image = NSImage(contentsOf: url) else { return }
-        openEditor(image: image, sourceURL: url)
+        DispatchQueue.main.async {
+            NSApplication.shared.setActivationPolicy(.regular)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+
+            let panel = NSOpenPanel()
+            panel.allowedContentTypes = [.png, .jpeg, .tiff, .bmp]
+            panel.canChooseDirectories = false
+            panel.allowsMultipleSelection = false
+            if panel.runModal() == .OK, let url = panel.url,
+               let image = NSImage(contentsOf: url) {
+                self.openEditor(image: image, sourceURL: url)
+            } else {
+                NSApplication.shared.setActivationPolicy(.accessory)
+            }
+        }
     }
 
     private func openEditor(image: NSImage, sourceURL: URL) {
