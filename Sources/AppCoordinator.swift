@@ -126,6 +126,11 @@ final class AppCoordinator: ObservableObject {
             return
         }
 
+        if modeString == "paste" || modeString == "clipboard" || modeString == "editclipboard" {
+            openEditorFromClipboard()
+            return
+        }
+
         let mode: CaptureMode?
         switch modeString {
         case "fullscreen", "full", "full-screen", "screen":
@@ -208,6 +213,16 @@ final class AppCoordinator: ObservableObject {
               let image = NSImage(contentsOf: url) else { return }
         DispatchQueue.main.async {
             self.openEditor(image: image, sourceURL: url)
+        }
+    }
+
+    func openEditorFromClipboard() {
+        guard let pasteboard = NSPasteboard.general.readObjects(forClasses: [NSImage.self], options: nil),
+              let image = pasteboard.first as? NSImage else { return }
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent(Self.filename(ext: imageFormat.fileExtension))
+        DispatchQueue.main.async {
+            self.openEditor(image: image, sourceURL: tempURL)
         }
     }
 

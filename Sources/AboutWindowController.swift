@@ -119,6 +119,7 @@ struct HelpTab: View {
                     urlRow("snippingtool://fullscreen?edit=true", "Vollbild + Editor")
                     urlRow("snippingtool://edit", "Bild aus Datei bearbeiten")
                     urlRow("snippingtool://editlast", "Letzten Screenshot bearbeiten")
+                    urlRow("snippingtool://clipboard", "Zwischenablage bearbeiten")
                 }
 
                 helpSection("Einrichtung in Logitech Options+") {

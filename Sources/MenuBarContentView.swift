@@ -16,6 +16,10 @@ struct MenuBarContentView: View {
         }
         .disabled(coordinator.lastCapturedURL == nil)
 
+        Button("Aus Zwischenablage bearbeiten") {
+            coordinator.openEditorFromClipboard()
+        }
+
         Button("Bild bearbeiten…") {
             coordinator.openEditorForFile()
         }
