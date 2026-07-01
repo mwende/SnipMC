@@ -105,34 +105,44 @@ final class AppCoordinator: ObservableObject {
     func handle(url: URL) {
         guard url.scheme?.caseInsensitiveCompare("snippingtool") == .orderedSame else { return }
 
-        let modeString = url.host?.lowercased()
-            ?? URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                .queryItems?
-                .first(where: { $0.name.caseInsensitiveCompare("mode") == .orderedSame })?
-                .value?
-                .lowercased()
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let queryItems = components?.queryItems ?? []
 
+        let modeString = url.host?.lowercased()
+            ?? queryItems.first(where: { $0.name.caseInsensitiveCompare("mode") == .orderedSame })?
+                .value?.lowercased()
+
+        let wantsEditor = queryItems.first(where: { $0.name.caseInsensitiveCompare("edit") == .orderedSame })?
+            .value?.lowercased() ?? "false"
+        let openEditor = ["true", "1", "yes"].contains(wantsEditor)
+
+        let mode: CaptureMode?
         switch modeString {
         case "fullscreen", "full", "full-screen", "screen":
-            capture(mode: .fullScreen)
+            mode = .fullScreen
         case "window":
-            capture(mode: .window)
+            mode = .window
         case "region", "area", "selection":
-            capture(mode: .region)
+            mode = .region
         default:
+            mode = nil
             NSLog("SnippingTool: unrecognized URL trigger \(url.absoluteString)")
+        }
+
+        if let mode {
+            capture(mode: mode, openEditor: openEditor)
         }
     }
 
     // MARK: - Capture
 
-    func capture(mode: CaptureMode) {
+    func capture(mode: CaptureMode, openEditor: Bool = false) {
         let saves = outputAction.savesToFile
         let copies = outputAction.copiesToClipboard
         let ext = imageFormat.fileExtension
 
         let targetURL: URL
-        if saves {
+        if saves || openEditor {
             try? FileManager.default.createDirectory(at: saveFolder, withIntermediateDirectories: true)
             targetURL = saveFolder.appendingPathComponent(Self.filename(ext: ext))
         } else {
@@ -148,7 +158,7 @@ final class AppCoordinator: ObservableObject {
         process.arguments = arguments
         process.terminationHandler = { [weak self] _ in
             DispatchQueue.main.async {
-                self?.handleCaptured(at: targetURL, saves: saves, copies: copies)
+                self?.handleCaptured(at: targetURL, saves: saves, copies: copies, openEditor: openEditor)
             }
         }
 
@@ -159,10 +169,15 @@ final class AppCoordinator: ObservableObject {
         }
     }
 
-    private func handleCaptured(at url: URL, saves: Bool, copies: Bool) {
+    private func handleCaptured(at url: URL, saves: Bool, copies: Bool, openEditor: Bool = false) {
         guard FileManager.default.fileExists(atPath: url.path) else { return }
 
-        lastCapturedURL = saves ? url : nil
+        lastCapturedURL = url
+
+        if openEditor, let image = NSImage(contentsOf: url) {
+            self.openEditor(image: image, sourceURL: url)
+            return
+        }
 
         if copies, let image = NSImage(contentsOf: url) {
             let pasteboard = NSPasteboard.general
