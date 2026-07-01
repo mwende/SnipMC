@@ -1,0 +1,7 @@
+build/
+Distribution/
+Generated/
+SnippingTool.xcodeproj/
+.DS_Store
+xcuserdata/
+*.xcuserstate
