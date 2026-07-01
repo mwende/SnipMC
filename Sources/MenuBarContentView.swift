@@ -11,6 +11,17 @@ struct MenuBarContentView: View {
 
         Divider()
 
+        Button("Letzte Aufnahme bearbeiten…") {
+            coordinator.openEditorForLastCapture()
+        }
+        .disabled(coordinator.lastCapturedURL == nil)
+
+        Button("Bild bearbeiten…") {
+            coordinator.openEditorForFile()
+        }
+
+        Divider()
+
         Button("Einstellungen…") {
             SettingsWindowController.shared.show(coordinator: coordinator)
         }

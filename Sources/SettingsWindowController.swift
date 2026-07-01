@@ -32,7 +32,9 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        // Menu bar-only apps should not keep a Dock icon after the window closes.
-        NSApplication.shared.setActivationPolicy(.accessory)
+        let otherVisible = NSApplication.shared.windows.filter { $0.isVisible && $0 != window }
+        if otherVisible.isEmpty {
+            NSApplication.shared.setActivationPolicy(.accessory)
+        }
     }
 }

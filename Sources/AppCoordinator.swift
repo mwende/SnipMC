@@ -36,6 +36,9 @@ final class AppCoordinator: ObservableObject {
         didSet { persistAndRegister(mode: .region, combo: hotKeyRegion) }
     }
 
+    @Published var lastCapturedURL: URL?
+    private var editorController: EditorWindowController?
+
     init() {
         let defaults = UserDefaults.standard
 
@@ -157,10 +160,9 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func handleCaptured(at url: URL, saves: Bool, copies: Bool) {
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            // User cancelled the interactive capture (Esc).
-            return
-        }
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+
+        lastCapturedURL = saves ? url : nil
 
         if copies, let image = NSImage(contentsOf: url) {
             let pasteboard = NSPasteboard.general
@@ -170,6 +172,57 @@ final class AppCoordinator: ObservableObject {
 
         if !saves {
             try? FileManager.default.removeItem(at: url)
+        }
+    }
+
+    // MARK: - Editor
+
+    func openEditorForLastCapture() {
+        guard let url = lastCapturedURL,
+              FileManager.default.fileExists(atPath: url.path),
+              let image = NSImage(contentsOf: url) else { return }
+        openEditor(image: image, sourceURL: url)
+    }
+
+    func openEditorForFile() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.png, .jpeg, .tiff, .bmp]
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url,
+              let image = NSImage(contentsOf: url) else { return }
+        openEditor(image: image, sourceURL: url)
+    }
+
+    private func openEditor(image: NSImage, sourceURL: URL) {
+        let controller = EditorWindowController(image: image, sourceURL: sourceURL) { [weak self] annotatedImage in
+            guard let self, let annotatedImage else { return }
+            self.saveAnnotatedImage(annotatedImage, replacingFileAt: sourceURL)
+        }
+        editorController = controller
+        controller.showEditor()
+    }
+
+    private func saveAnnotatedImage(_ image: NSImage, replacingFileAt url: URL) {
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData) else { return }
+
+        let fileType: NSBitmapImageRep.FileType = imageFormat == .jpg ? .jpeg : .png
+        let properties: [NSBitmapImageRep.PropertyKey: Any] = fileType == .jpeg
+            ? [.compressionFactor: 0.9] : [:]
+
+        guard let data = bitmap.representation(using: fileType, properties: properties) else { return }
+
+        do {
+            try data.write(to: url, options: .atomic)
+        } catch {
+            NSLog("SnippingTool: failed to save annotated image: \(error)")
+        }
+
+        if outputAction.copiesToClipboard {
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.writeObjects([image])
         }
     }
 
