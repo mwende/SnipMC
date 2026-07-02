@@ -1,11 +1,28 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var coordinator: AppCoordinator
+    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
         Form {
+            Section("Allgemein") {
+                Toggle("Mit dem System starten", isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { _, newValue in
+                        do {
+                            if newValue {
+                                try SMAppService.mainApp.register()
+                            } else {
+                                try SMAppService.mainApp.unregister()
+                            }
+                        } catch {
+                            launchAtLogin = SMAppService.mainApp.status == .enabled
+                        }
+                    }
+            }
+
             Section("Nach der Aufnahme") {
                 Picker("Aktion:", selection: $coordinator.outputAction) {
                     ForEach(OutputAction.allCases) { action in
