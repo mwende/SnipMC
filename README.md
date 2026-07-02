@@ -21,8 +21,12 @@ SnipMC ist ein schlankes Screenshot-Tool für macOS, das in der Menüleiste lebt
 
 1. `SnipMC.dmg` aus dem [aktuellen Release](https://github.com/mwende/SnipMC/releases/latest) herunterladen
 2. DMG öffnen und `SnipMC.app` nach `/Programme` ziehen
-3. App starten — das Kamera-Icon erscheint in der Menüleiste
-4. Beim ersten Start die Berechtigung **Bildschirmaufnahme** erteilen:
+3. Gatekeeper-Sperre aufheben (da die App nicht mit einem Apple Developer Zertifikat signiert ist):
+   ```bash
+   xattr -cr /Applications/SnipMC.app
+   ```
+4. App starten — das Kamera-Icon erscheint in der Menüleiste
+5. Beim ersten Start die Berechtigung **Bildschirmaufnahme** erteilen:
    *Systemeinstellungen → Datenschutz & Sicherheit → Bildschirmaufnahme*
 
 ## Screenshot-Modi
