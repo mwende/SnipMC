@@ -108,7 +108,8 @@ final class AnnotationCanvasView: NSView {
         let handleRect: CGRect
         if item.kind == .arrow {
             let start = item.rect.origin
-            let end = CGPoint(x: item.rect.maxX, y: item.rect.maxY)
+            let end = CGPoint(x: item.rect.origin.x + item.rect.size.width,
+                              y: item.rect.origin.y + item.rect.size.height)
             handleRect = CGRect(x: min(start.x, end.x), y: min(start.y, end.y),
                                 width: abs(end.x - start.x), height: abs(end.y - start.y))
         } else if item.kind == .text {

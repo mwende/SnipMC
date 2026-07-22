@@ -48,7 +48,8 @@ enum AnnotationRenderer {
 
     private static func drawArrow(_ item: AnnotationItem, in context: CGContext) {
         let start = item.rect.origin
-        let end = CGPoint(x: item.rect.maxX, y: item.rect.maxY)
+        let end = CGPoint(x: item.rect.origin.x + item.rect.size.width,
+                          y: item.rect.origin.y + item.rect.size.height)
 
         context.move(to: start)
         context.addLine(to: end)
@@ -98,9 +99,11 @@ enum AnnotationRenderer {
     static func hitTest(point: CGPoint, item: AnnotationItem, tolerance: CGFloat = 6) -> Bool {
         switch item.kind {
         case .arrow:
+            let arrowEnd = CGPoint(x: item.rect.origin.x + item.rect.size.width,
+                                   y: item.rect.origin.y + item.rect.size.height)
             return distanceToLine(point: point,
                                   from: item.rect.origin,
-                                  to: CGPoint(x: item.rect.maxX, y: item.rect.maxY)) < tolerance + item.lineWidth
+                                  to: arrowEnd) < tolerance + item.lineWidth
         case .rectangle:
             let outer = item.rect.insetBy(dx: -(tolerance + item.lineWidth),
                                           dy: -(tolerance + item.lineWidth))
