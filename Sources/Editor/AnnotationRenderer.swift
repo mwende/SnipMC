@@ -28,9 +28,11 @@ enum AnnotationRenderer {
     static func render(annotations: [AnnotationItem], onto image: NSImage) -> NSImage {
         let size = image.size
         let result = NSImage(size: size)
-        result.lockFocus()
+        result.lockFocusFlipped(true)
 
-        image.draw(in: NSRect(origin: .zero, size: size))
+        image.draw(in: NSRect(origin: .zero, size: size),
+                   from: .zero, operation: .sourceOver, fraction: 1,
+                   respectFlipped: true, hints: nil)
 
         if let context = NSGraphicsContext.current?.cgContext {
             for item in annotations {

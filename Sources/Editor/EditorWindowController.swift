@@ -1,6 +1,10 @@
 import AppKit
 import SwiftUI
 
+private final class FlippedContainerView: NSView {
+    override var isFlipped: Bool { true }
+}
+
 final class EditorWindowController: NSWindowController, NSWindowDelegate {
 
     private let annotationDoc = AnnotationDocument()
@@ -19,7 +23,7 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate {
         let maxHeight = screenFrame.height * 0.8
         let scale = min(maxWidth / image.size.width, maxHeight / image.size.height, 1.0)
         let windowWidth = max(image.size.width * scale, 600)
-        let windowHeight = max(image.size.height * scale, 400) + 52 // toolbar height
+        let windowHeight = max(image.size.height * scale, 400) + 52
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: windowHeight),
@@ -40,7 +44,6 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate {
         canvasView.onDocumentChanged = { [weak self] in
             self?.canvasView.needsDisplay = true
         }
-        canvasView.autoresizingMask = [.width, .height]
 
         let toolbarHosting = NSHostingView(rootView: EditorToolbarView(
             document: annotationDoc,
@@ -48,23 +51,25 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate {
             onCopyToClipboard: { [weak self] in self?.copyToClipboard() },
             onCancel: { [weak self] in self?.cancel() }
         ))
-        toolbarHosting.translatesAutoresizingMaskIntoConstraints = true
+        toolbarHosting.translatesAutoresizingMaskIntoConstraints = false
+        canvasView.translatesAutoresizingMaskIntoConstraints = false
 
-        let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
-        container.autoresizingMask = [.width, .height]
-
-        toolbarHosting.frame = NSRect(x: 0, y: container.bounds.height - 52,
-                                       width: container.bounds.width, height: 52)
-        toolbarHosting.autoresizingMask = [.width, .minYMargin]
-
-        canvasView.frame = NSRect(x: 0, y: 0,
-                                   width: container.bounds.width,
-                                   height: container.bounds.height - 52)
-        canvasView.autoresizingMask = [.width, .height]
-
+        let container = FlippedContainerView()
         container.addSubview(toolbarHosting)
         container.addSubview(canvasView)
         window.contentView = container
+
+        NSLayoutConstraint.activate([
+            toolbarHosting.topAnchor.constraint(equalTo: container.topAnchor),
+            toolbarHosting.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            toolbarHosting.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            toolbarHosting.heightAnchor.constraint(equalToConstant: 52),
+
+            canvasView.topAnchor.constraint(equalTo: toolbarHosting.bottomAnchor),
+            canvasView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            canvasView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            canvasView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+        ])
     }
 
     @available(*, unavailable)
